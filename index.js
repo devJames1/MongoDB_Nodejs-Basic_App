@@ -18,6 +18,7 @@ app.get('/', (req, res) => {
     )
 })
 
+//Default enviroment settings
 app.set('views', path.join(__dirname, '/views/'))
 
 app.engine('hbs', exphbs({
@@ -26,5 +27,7 @@ app.engine('hbs', exphbs({
     defaultLayout: 'MainLayout',
     layoutsDir: __dirname + '/views/layouts'
 }))
+
+app.set('view engine', 'hbs')
 
 app.listen(3000, () => console.log('Server started at port 3000'))
