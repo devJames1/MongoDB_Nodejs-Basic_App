@@ -14,4 +14,8 @@ const connectToDatabase = async () => {
     }
 }
 
+connectToDatabase()
+const database = client.db('StudentsDB')
+
 require('./student.model')
+module.exports = { client, database }
