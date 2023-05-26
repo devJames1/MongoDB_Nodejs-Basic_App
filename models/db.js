@@ -1,21 +1,20 @@
 //Here we put our instructions for our database
+require('./student.model');
+const { MongoClient } = require('mongodb');
+const uri = 'mongodb://127.0.0.1:27017/StudentsDB';
 
-const { MongoClient } = require('mongodb')
-const uri = 'mongodb://localhost:27017/StudentsDB'
+const withDB = async (operations, response) => {
+  try {
+    const client = await MongoClient.connect(uri, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+    const db = client.db('StudentsDB');
+    await operations(db);
+    client.close();
+  } catch (err) {
+    console.error(`Error with database operations: ${err}`);
+  }
+};
 
-const client = new MongoClient(uri)
-
-const connectToDatabase = async () => {
-    try {
-        await client.connect()
-        console.log('Connection succesful')
-    }catch(err) {
-        console.error(`Error in connection: ${err}`)
-    }
-}
-
-connectToDatabase()
-const database = client.db('StudentsDB')
-
-require('./student.model')
-module.exports = { client, database }
+module.exports = { withDB };

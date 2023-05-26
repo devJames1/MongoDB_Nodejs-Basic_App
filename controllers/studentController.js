@@ -1,83 +1,67 @@
-const express = require('express')
-const router = express.Router()
-const { MongoClient } = require('mongodb')
-const { createStudentColl } = require('../models/student.model')
-const { database, client } = require('../models/db')
-const { resolve } = require('path')
+const conn = require('../index');
+const express = require('express');
+const router = express.Router();
+const ObjectId = require('mongodb').ObjectId;
+const { resolve } = require('path');
+const { insertRecord, updateRecord } = require('../models/student.model');
+
+const { withDB } = require('../models/db');
 
 router.get('/', (req, res) => {
-    res.render('student/addOrEdit', {
-        viewTitle: 'Insert Student'
-    })
-})
+  res.render('student/addOrEdit', {
+    viewTitle: 'Insert Student',
+  });
+});
 
 router.post('/', (req, res) => {
-    if(req.body._id == '') {
-        insertRecord(req, res)
-    }else {
-        updateRecord(req, res)
-    }
-})
+  console.log(req.body);
+  if (req.body._id == '') {
+    insertRecord(req, res);
+  } else {
+    updateRecord(req, res);
+  }
+});
 
-async function insertRecord (req, res) {
-    try{
-        await createStudentColl()
-        const data = req.body
-        await database.collection('students').insertOne(data)
-        res.redirect('/student/list')
-    }catch(err) {
-           console.error(`Error during insert: ${err}`) 
-    }finally {
-        await client.close
-    }
-}
+router.get('/list', (req, res) => {
+  try {
+    withDB(async (db) => {
+      const studentDocList = await db.collection('students').find({}).toArray();
+      res.render('./student/list', {
+        list: studentDocList,
+      });
+    }, res);
+  } catch (err) {
+    console.error(`Error in retrival: ${err}`);
+  }
+});
 
-async function updateRecord(req, res) {
-    try{
-        await database.collection('students').findOneAndUpdate({_id: req.body._id}, req.body, {new: true})
-        res.redirect('student/list')
-    }catch(err) {
-        console.error(`Error during update: ${err}`)
-    }finally {
-        client.close()
-    }
-}
+router.get('/:id', (req, res) => {
+  try {
+    withDB(async (db) => {
+      const doc = await db
+        .collection('students')
+        .findOne({ _id: new ObjectId(req.params.id) });
+      res.render('./student/addOrEdit', {
+        viewTitle: 'Update Student',
+        student: doc,
+      });
+    }, res);
+  } catch (err) {
+    console.error(`Error in retrieval: ${err}`);
+  }
+});
 
-router.get('/list', async (req, res) => {
-    try {
-        await database.collection('students').find((docs))
-        res.render('students/list', {
-            list: docs
-        })
-    }catch(err) {
-        console.error(`Error in retrival: ${err}`)
-    }finally{
-        client.close()
-    }
-})
+router.get('/delete/:id', (req, res) => {
+  try {
+    withDB(async (db) => {
+      await db
+        .collection('students')
+        .deleteOne({ _id: new ObjectId(req.params.id) });
+      res.redirect('/student/list');
+    }, res);
+  } catch (err) {
+    console.error(`Error in deletion: ${err}`);
+  }
+});
 
-router.get('/:id', async (req, res) => {
-    try{
-        const doc = await database.collection('students').findOne({_id: req.params.id})
-        res.render('/student/addOrEdit', {
-            viewTitle: 'Update Student', 
-            student: doc
-        })
-        console.log(doc)
-    }catch(err) {
-        console.error(`Error in retrieval: ${err}`)
-    }finally {
-        client.close()
-    }
-})
-
-router.get('delete/:id', async (req, res) => {
-    try{
-        await database.collection('students').deleteOne({_id: req.params.id})
-        res.redirect('/student/list')
-    }catch(err) {
-        console.error(`Error in deletion: ${err}`)
-    }finally {
-        client.close()
-    }
-})
+module.exports = router;

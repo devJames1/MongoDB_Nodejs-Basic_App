@@ -1,44 +1,45 @@
-// This wherevwe do our instuctions for student model
-const { MongoClient } = require('mongodb')
-const {client} = require('../models/db')
+const { withDB } = require('./db');
+const ObjectId = require('mongodb').ObjectId;
 
-const StudentSchema = {
- validator: {
-    $jsonSchema: {
-        bsonType: 'object',
-        tittle: 'Student Object Validation',
-        required: ['fullName', 'email', 'mobile', 'city'],
-        properties: {
-            fullName: {
-                bsonType: 'string',
-                description: "'fullName' must be a string and is required"
-            },
-            email: {
-                bsonType: 'string',
-                description: "'email' must be a string and is required"
-            },
-            mobile: {
-                bsonType: 'number',
-                description: "'mobile' must be number and is required"
-            },
-            city: {
-                bsonType: 'string',
-                description: "'city' must be a string and is required"
-            },
+async function insertRecord(req, res) {
+  try {
+    withDB(async (db) => {
+      const data = {
+        fullName: req.body.fullName,
+        email: req.body.email,
+        mobile: Number(req.body.mobile),
+        city: req.body.city,
+      };
+      await db.collection('students').insertOne(data);
+      res.redirect('/student/list');
+    }, res);
+  } catch (err) {
+    console.error(`Error during insert: ${err}`);
+  }
+}
+
+async function updateRecord(req, res) {
+  try {
+    withDB(async (db) => {
+      await db.collection('students').findOneAndUpdate(
+        { _id: new ObjectId(req.body._id) },
+        {
+          $set: {
+            fullName: req.body.fullName,
+            email: req.body.email,
+            mobile: Number(req.body.mobile),
+            city: req.body.city,
+          },
+        },
+        {
+          returnNewDocument: true,
         }
-    }
- }
+      );
+      res.redirect('student/list');
+    });
+  } catch (err) {
+    console.error(`Error during update: ${err}`);
+  }
 }
 
-const createStudentColl = async () => {
-    
-    try { 
-        await client.db('StudentsDB').createCollection('students', StudentSchema)
-    }catch(err) {
-        throw err
-    }
-
-}
-
-
-module.exports = { StudentSchema, createStudentColl}
+module.exports = { insertRecord, updateRecord };

@@ -1,27 +1,51 @@
 <h3>{{viewTitle}}</h3>
 
-<form action="/student" method="POST" autocomplete="off">
-    <input type="hidden" name="_id" value="{{_id}}">
-    <div class="form-group">
-        <label>Full name</label>
-        <input type="text" name="fullName" class="form-control" placeholder="Full Name" value="{{fullName}}">
+<form action='/student' method='POST' autocomplete='off'>
+  <input type='hidden' name='_id' value='{{student._id}}' />
+  <div class='form-group'>
+    <label>Full name</label>
+    <input
+      type='text'
+      name='fullName'
+      class='form-control'
+      placeholder='Full Name'
+      value='{{student.fullName}}'
+    />
+  </div>
+  <div class='form-group'>
+    <label>Email</label>
+    <input
+      type='text'
+      name='email'
+      class='form-control'
+      placeholder='Email'
+      value='{{student.email}}'
+    />
+  </div>
+  <div class='form-row'>
+    <div class='form-group col-md-6'>
+      <label>Mobile</label>
+      <input
+        type='text'
+        name='mobile'
+        class='form-control'
+        placeholder='Mobile'
+        value='{{student.mobile}}'
+      />
     </div>
-    <div class="form-group">
-        <label>Email</label>
-        <input type="text" name="email" class="form-control" placeholder="Email" value="{{email}}">
+    <div class='form-groupcol-md-6'>
+      <label>City</label>
+      <input
+        type='text'
+        name='city'
+        class='form-control'
+        placeholder='City'
+        value='{{student.city}}'
+      />
     </div>
-    <div class="form-row">
-        <div class="form-group col-md-6">
-            <label>Mobile</label>
-            <input type="text" name="mobile" class="form-control" placeholder="Mobile" value="{{mobile}}">
-        </div>
-        <div class="form-groupcol-md-6">
-            <label>City</label>
-            <input type="text" name="city" class="form-control" placeholder="City" value="{{city}}">
-        </div>
-    </div>
-    <div class="form-group">
-        <button type="submit" class="btn btn-info">Submit</button>
-        <a class="btn btn-secondary" href="/student/list">View All</a>
-    </div>
+  </div>
+  <div class='form-group'>
+    <button type='submit' class='btn btn-info'>Submit</button>
+    <a class='btn btn-secondary' href='/student/list'>View All</a>
+  </div>
 </form>
