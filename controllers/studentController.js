@@ -2,7 +2,7 @@ const conn = require('../index');
 const express = require('express');
 const router = express.Router();
 const ObjectId = require('mongodb').ObjectId;
-const { resolve } = require('path');
+// const { resolve } = require('path');
 const { insertRecord, updateRecord } = require('../models/student.model');
 
 const { withDB } = require('../models/db');
@@ -57,7 +57,10 @@ router.get('/delete/:id', (req, res) => {
       await db
         .collection('students')
         .deleteOne({ _id: new ObjectId(req.params.id) });
-      res.redirect('/student/list');
+      const studentDocList = await db.collection('students').find({}).toArray();
+      res.render('./student/list', {
+        list: studentDocList,
+      });
     }, res);
   } catch (err) {
     console.error(`Error in deletion: ${err}`);
