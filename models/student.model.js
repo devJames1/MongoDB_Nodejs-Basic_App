@@ -1,3 +1,5 @@
+//This is the operations for students database
+
 const { withDB } = require('./db');
 const ObjectId = require('mongodb').ObjectId;
 
@@ -42,4 +44,37 @@ async function updateRecord(req, res) {
   }
 }
 
-module.exports = { insertRecord, updateRecord };
+async function findAll(req, res) {
+  withDB(async (db) => {
+    const studentDocList = await db.collection('students').find({}).toArray();
+    res.render('./student/list', {
+      list: studentDocList,
+    });
+  }, res);
+}
+
+async function findOne(req, res) {
+  withDB(async (db) => {
+    const doc = await db
+      .collection('students')
+      .findOne({ _id: new ObjectId(req.params.id) });
+    res.render('./student/addOrEdit', {
+      viewTitle: 'Update Student',
+      student: doc,
+    });
+  }, res);
+}
+
+async function deleteOne(req, res) {
+  withDB(async (db) => {
+    await db
+      .collection('students')
+      .deleteOne({ _id: new ObjectId(req.params.id) });
+    const studentDocList = await db.collection('students').find({}).toArray();
+    res.render('./student/list', {
+      list: studentDocList,
+    });
+  }, res);
+}
+
+module.exports = { insertRecord, updateRecord, findAll, findOne, deleteOne };

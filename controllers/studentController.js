@@ -1,11 +1,15 @@
-const conn = require('../index');
+//This is for controlling student routes and requests from client and model on the route
+
 const express = require('express');
 const router = express.Router();
 const ObjectId = require('mongodb').ObjectId;
-// const { resolve } = require('path');
-const { insertRecord, updateRecord } = require('../models/student.model');
-
-const { withDB } = require('../models/db');
+const {
+  insertRecord,
+  updateRecord,
+  findAll,
+  findOne,
+  deleteOne,
+} = require('../models/student.model');
 
 router.get('/', (req, res) => {
   res.render('student/addOrEdit', {
@@ -24,12 +28,7 @@ router.post('/', (req, res) => {
 
 router.get('/list', (req, res) => {
   try {
-    withDB(async (db) => {
-      const studentDocList = await db.collection('students').find({}).toArray();
-      res.render('./student/list', {
-        list: studentDocList,
-      });
-    }, res);
+    findAll(req, res);
   } catch (err) {
     console.error(`Error in retrival: ${err}`);
   }
@@ -37,15 +36,7 @@ router.get('/list', (req, res) => {
 
 router.get('/:id', (req, res) => {
   try {
-    withDB(async (db) => {
-      const doc = await db
-        .collection('students')
-        .findOne({ _id: new ObjectId(req.params.id) });
-      res.render('./student/addOrEdit', {
-        viewTitle: 'Update Student',
-        student: doc,
-      });
-    }, res);
+    findOne(req, res);
   } catch (err) {
     console.error(`Error in retrieval: ${err}`);
   }
@@ -53,15 +44,7 @@ router.get('/:id', (req, res) => {
 
 router.get('/delete/:id', (req, res) => {
   try {
-    withDB(async (db) => {
-      await db
-        .collection('students')
-        .deleteOne({ _id: new ObjectId(req.params.id) });
-      const studentDocList = await db.collection('students').find({}).toArray();
-      res.render('./student/list', {
-        list: studentDocList,
-      });
-    }, res);
+    deleteOne(req, res);
   } catch (err) {
     console.error(`Error in deletion: ${err}`);
   }

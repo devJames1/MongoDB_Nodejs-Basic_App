@@ -1,22 +1,15 @@
+//Entry point of the app with basic configurations for dependencies
+
 const express = require('express');
-const path = require('path');
-const handlebars = require('handlebars');
 const hbs = require('express-handlebars');
-const {
-  allowInsecurePrototypeAccess,
-} = require('@handlebars/allow-prototype-access');
-const bodyparser = require('body-parser');
+const path = require('path');
 
 const studentController = require('./controllers/studentController');
-
 const app = express();
 
-// const mongo = require('./models/db');
-// mongo.connectToDatabase();
-
-//body parser use json to encrypt the content
-app.use(bodyparser.urlencoded({ extended: false }));
-app.use(bodyparser.json());
+//express use json to encrypt the content
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 
 app.get('/', (req, res) => {
   res.send(
@@ -28,7 +21,6 @@ app.get('/', (req, res) => {
 app.engine(
   'hbs',
   hbs.create({
-    handlebars: allowInsecurePrototypeAccess(handlebars),
     extname: 'hbs',
     defaultLayout: 'MainLayout',
     layoutsDir: __dirname + '/views/layouts',
